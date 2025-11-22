@@ -1,0 +1,4 @@
+project_id = "bslebjldnoodzwwfupww"
+
+[functions.identify-breed]
+verify_jwt = false
