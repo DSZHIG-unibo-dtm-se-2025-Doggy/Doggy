@@ -3,9 +3,10 @@ import { Hero } from "@/components/Hero";
 import { ImageUpload } from "@/components/ImageUpload";
 import { Footer } from "@/components/Footer";
 import { useBreedIdentification } from "@/hooks/useBreedIdentification";
+import { DogInfoPanel } from "@/components/DogInfoPanel";
 
 const Index = () => {
-  const { isAnalyzing, identifyBreed } = useBreedIdentification();
+  const { isAnalyzing, identifyBreed, result, error } = useBreedIdentification();
 
   return (
     <div className="min-h-screen">
@@ -27,6 +28,12 @@ const Index = () => {
           <ImageUpload 
             onImageSelected={identifyBreed}
             isAnalyzing={isAnalyzing}
+          />
+
+          <DogInfoPanel
+            result={result}
+            isAnalyzing={isAnalyzing}
+            error={error}
           />
         </div>
       </section>
