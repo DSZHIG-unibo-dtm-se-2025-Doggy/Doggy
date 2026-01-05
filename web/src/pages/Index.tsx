@@ -3,7 +3,7 @@ import { Hero } from "@/components/Hero";
 import { ImageUpload } from "@/components/ImageUpload";
 import { Footer } from "@/components/Footer";
 import { useBreedIdentification } from "@/hooks/useBreedIdentification";
-import { DogInfoPanel } from "@/components/DogInfoPanel";
+import { DogInfoPanel } from "@/components/ui/DogInfoPanel";
 
 const Index = () => {
   const { isAnalyzing, identifyBreed, result, error } = useBreedIdentification();
