@@ -28,6 +28,10 @@ export const useBreedIdentification = () => {
 
       const data = await response.json();
 
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
       setResult({
         breed: data.breed,
         advice: data.advice,

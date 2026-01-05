@@ -67,11 +67,16 @@ async def dog_from_photo(file: UploadFile = File(...)):
         f.write(await file.read())
 
     try:
-        # --- 2. Predict breed ---
+        # --- 2. Zero-shot dog check ---
+        is_dog = dog_model.is_dog(temp_path)
+        if not is_dog:
+            return {"error": "Sorry, this is not a dog. Please try again"}
+
+        # --- 3. Predict breed ---
         preds = dog_model.predict(temp_path)
         top_label = preds[0]["label"]
 
-        # --- 3. Generate LLM advice ---
+        # --- 4. Generate LLM advice ---
         advice = llm.generate_advice(top_label)
 
         return {"breed": top_label, "raw_predictions": preds, "advice": advice}
@@ -80,6 +85,6 @@ async def dog_from_photo(file: UploadFile = File(...)):
         return {"error": str(e)}
 
     finally:
-        # --- 4. Remove temp file ---
+        # --- 5. Remove temp file ---
         if os.path.exists(temp_path):
             os.remove(temp_path)
