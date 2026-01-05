@@ -144,14 +144,15 @@ See `.github/workflows/backend-ci.yml` for details.
 ### Continuous Deployment
 
 Automatic deployment to Fly.io is triggered on:
-- Push to `releases/backend/*` branches (e.g., `releases/backend/1.0.0`)
+- Push of tags matching `backend/v*` or `v*` (e.g., `backend/v1.0.0` or `v1.0.0`)
 
 See [Deployment to Fly.io](#deployment-to-flyio) section for details.
 
 ### Deployment to Fly.io
 
-The backend is automatically deployed to Fly.io when changes are pushed to:
-- `releases/backend/VERSION` branches (versioned releases)
+The backend is automatically deployed to Fly.io when tags are pushed:
+- Tags matching `backend/v*` (e.g., `backend/v1.0.0`)
+- Tags matching `v*` (e.g., `v1.0.0`)
 
 **Initial Setup:**
 
@@ -181,14 +182,29 @@ flyctl secrets set HF_TOKEN=your_huggingface_token_here
    - Add `FLY_API_TOKEN` with your Fly.io API token
    - Get token: `flyctl auth token`
 
-**Automatic Deployment:**
+**Releasing a New Version:**
 
-Create a branch `releases/backend/VERSION` (e.g., `releases/backend/1.0.0`) to deploy a specific version:
+1. **Create and push a tag** (recommended approach):
 ```bash
-git checkout -b releases/backend/1.0.0
-git push origin releases/backend/1.0.0
+# From main branch after your changes are merged
+git tag backend/v1.0.0
+git push origin backend/v1.0.0
+# Or use semantic versioning tag
+git tag v1.0.0
+git push origin v1.0.0
 # Deployment will start automatically
 ```
+
+2. **Create a GitHub Release** (optional but recommended):
+   - Go to GitHub repository → Releases → Create a new release
+   - Choose the tag you just created
+   - Add release notes describing changes
+   - This creates a permanent record of the release
+
+**Tag Naming:**
+- Use semantic versioning: `v1.0.0`, `v1.1.0`, `v2.0.0`
+- Prefixed tags: `backend/v1.0.0` (for backend-specific releases)
+- Both formats are supported
 
 **Manual Deployment:**
 
