@@ -1,8 +1,4 @@
-from fastapi import APIRouter, UploadFile, File
-from fastapi.responses import JSONResponse
-import tempfile
-import shutil
-import os
+from fastapi import APIRouter, File, UploadFile
 
 from Features.DogRecognition.dog_recognition import DogRecognitionModel
 from Features.LLM.llm_engine import DogLLMEngine
