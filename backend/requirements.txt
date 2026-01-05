@@ -1,8 +1,9 @@
-fastapi==0.118.2
-uvicorn==0.37.0
-python-multipart==0.0.20
-pillow==11.3.0
-transformers==4.46.3
-torch>=2.2.0
+fastapi>=0.115.0
+uvicorn[standard]>=0.32.0
+python-multipart>=0.0.12
+pillow>=11.0.0
+transformers>=4.45.0
+torch==2.2.2
 numpy<2
-gpt4all==2.8.2
+huggingface-hub>=0.24.0
+python-dotenv>=1.0.0
