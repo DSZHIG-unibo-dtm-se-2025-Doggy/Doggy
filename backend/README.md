@@ -4,7 +4,7 @@ FastAPI backend for dog recognition project.
 
 ## Requirements
 
-- Python 3.14.2 (recommended)
+- Python 3.12.8 (see `.python-version`)
 - pip
 
 ## Setup
@@ -75,15 +75,60 @@ backend/
 │   └── LLM/            # LLM engine for advice generation
 ├── main.py            # FastAPI entry point
 ├── requirements.txt   # Python dependencies
-└── setup.sh          # Project setup script
+├── setup.sh           # Project setup script
+├── check.sh           # Code quality check script
+└── pyproject.toml     # Ruff and mypy configuration
 ```
+
+## Code Quality
+
+### Running Checks Locally
+
+Run all code quality checks:
+
+```bash
+./check.sh
+```
+
+This will run:
+- **ruff** - Linting and code formatting checks
+- **mypy** - Type checking (non-blocking)
+- **Syntax validation** - Compile check for all Python files
+
+### Manual Checks
+
+Format code:
+```bash
+ruff format .
+```
+
+Fix linting issues:
+```bash
+ruff check . --fix
+```
+
+Type checking:
+```bash
+mypy . --ignore-missing-imports
+```
+
+## CI/CD
+
+GitHub Actions automatically runs checks on push and pull requests:
+- Linting (ruff)
+- Code formatting (ruff format)
+- Type checking (mypy)
+- Syntax validation
+- Import checks
+
+See `.github/workflows/backend-ci.yml` for details.
 
 ## Python Version
 
-Python version is fixed in `.python-version` file (3.14.2).
+Python version is fixed in `.python-version` file.
 
 If you have `pyenv` installed, it will automatically use this version:
 ```bash
-pyenv install 3.14.2
-pyenv local 3.14.2
+pyenv install $(cat .python-version)
+pyenv local $(cat .python-version)
 ```

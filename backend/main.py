@@ -1,11 +1,11 @@
-from fastapi import FastAPI, UploadFile, File
+import os
+import uuid
+
+from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 
-from Features.LLM.llm_engine import DogLLMEngine
 from Features.DogRecognition.dog_recognition import DogRecognitionModel
-
-import uuid
-import os
+from Features.LLM.llm_engine import DogLLMEngine
 
 app = FastAPI()
 
@@ -17,6 +17,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 # ---------- Health Check ----------
 @app.get("/")
 def root():
@@ -24,21 +25,21 @@ def root():
 
 
 # ---------- Init LLM ----------
+llm: DogLLMEngine | None = None
 try:
     llm = DogLLMEngine()
     print("LLM loaded successfully")
 except Exception as e:
     print("LLM INIT ERROR:", e)
-    llm = None
 
 
 # ---------- Init Dog Recognition ----------
+dog_model: DogRecognitionModel | None = None
 try:
     dog_model = DogRecognitionModel()
     print("DogRecognition loaded successfully")
 except Exception as e:
     print("DOG MODEL INIT ERROR:", e)
-    dog_model = None
 
 
 # ---------- TEXT ENDPOINT ----------
@@ -73,11 +74,7 @@ async def dog_from_photo(file: UploadFile = File(...)):
         # --- 3. Generate LLM advice ---
         advice = llm.generate_advice(top_label)
 
-        return {
-            "breed": top_label,
-            "raw_predictions": preds,
-            "advice": advice
-        }
+        return {"breed": top_label, "raw_predictions": preds, "advice": advice}
 
     except Exception as e:
         return {"error": str(e)}

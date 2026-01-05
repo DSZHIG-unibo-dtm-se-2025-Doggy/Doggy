@@ -1,6 +1,7 @@
 import os
-from huggingface_hub import InferenceClient
+
 from dotenv import load_dotenv
+from huggingface_hub import InferenceClient
 
 load_dotenv()
 
@@ -40,4 +41,5 @@ List:
             temperature=0.3,
         )
 
-        return response.choices[0].message["content"]
+        content = response.choices[0].message.get("content", "")
+        return str(content) if content is not None else ""
