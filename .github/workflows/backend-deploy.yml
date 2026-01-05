@@ -1,0 +1,37 @@
+name: Deploy Backend to Fly.io
+
+on:
+  push:
+    branches: 
+      - 'releases/backend/**'
+    paths:
+      - 'backend/**'
+      - '.github/workflows/backend-deploy.yml'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy to Fly.io
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Extract version from branch name
+      id: version
+      run: |
+        VERSION=$(echo "${{ github.ref }}" | sed 's|refs/heads/releases/backend/||')
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        echo "Deploying version: $VERSION"
+
+    - name: Setup Fly.io CLI
+      uses: superfly/flyctl-actions/setup-flyctl@master
+
+    - name: Deploy to Fly.io
+      working-directory: ./backend
+      run: |
+        echo "Deploying version: ${{ steps.version.outputs.version }}"
+        flyctl deploy --remote-only
+      env:
+        FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
