@@ -2,8 +2,8 @@ name: Deploy Backend to Fly.io
 
 on:
   push:
-    branches: 
-      - 'releases/backend/**'
+    tags:
+      - 'backend/v*'
     paths:
       - 'backend/**'
       - '.github/workflows/backend-deploy.yml'
@@ -18,10 +18,16 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Extract version from branch name
+    - name: Extract version from tag
       id: version
       run: |
-        VERSION=$(echo "${{ github.ref }}" | sed 's|refs/heads/releases/backend/||')
+        if [[ "${{ github.ref }}" == refs/tags/backend/* ]]; then
+          VERSION=$(echo "${{ github.ref }}" | sed 's|refs/tags/backend/||')
+        elif [[ "${{ github.ref }}" == refs/tags/* ]]; then
+          VERSION=$(echo "${{ github.ref }}" | sed 's|refs/tags/||')
+        else
+          VERSION="manual"
+        fi
         echo "version=$VERSION" >> $GITHUB_OUTPUT
         echo "Deploying version: $VERSION"
 
