@@ -25,4 +25,6 @@ jobs:
           pip install pytest pytest-cov
       - name: Run pytest
         working-directory: backend
-        run: python -m pytest --cov=backend --cov-report=term-missing backend/tests
+        run: python -m pytest --cov=backend --cov-report=term-missing tests
+
+        
