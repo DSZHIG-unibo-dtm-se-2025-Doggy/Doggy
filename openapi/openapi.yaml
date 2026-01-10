@@ -27,13 +27,23 @@ paths:
             type: string
       responses:
         "200":
-          description: Advice response or error
+          description: Advice response
           content:
             application/json:
               schema:
-                oneOf:
-                  - $ref: "#/components/schemas/AdviceResponse"
-                  - $ref: "#/components/schemas/ErrorResponse"
+                $ref: "#/components/schemas/AdviceResponse"
+        "500":
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "503":
+          description: Service unavailable
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
         "422":
           description: Validation Error
           content:
@@ -51,13 +61,29 @@ paths:
               $ref: "#/components/schemas/Body_dog_from_photo_api_dog_from_photo_post"
       responses:
         "200":
-          description: Prediction response or error
+          description: Prediction response
           content:
             application/json:
               schema:
-                oneOf:
-                  - $ref: "#/components/schemas/DogFromPhotoResponse"
-                  - $ref: "#/components/schemas/ErrorResponse"
+                $ref: "#/components/schemas/DogFromPhotoResponse"
+        "400":
+          description: Invalid image or not a dog
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "503":
+          description: Service unavailable
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
         "422":
           description: Validation Error
           content:
