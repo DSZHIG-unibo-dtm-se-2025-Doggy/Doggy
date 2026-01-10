@@ -12,7 +12,7 @@ def test_router_predict(monkeypatch):
     # Avoid real HF token/model loading
     monkeypatch.setenv("HF_TOKEN", "dummy-token")
 
-    def fake_pipeline(task, model=None):
+    def fake_pipeline(*_, **__):
         return lambda *_, **__: [{"label": "husky", "score": 0.9}]
 
     class FakeInferenceClient:
@@ -30,6 +30,7 @@ def test_router_predict(monkeypatch):
 
             return Response()
 
+    monkeypatch.setattr("transformers.pipeline", fake_pipeline)
     monkeypatch.setattr(dr_module, "pipeline", fake_pipeline)
     monkeypatch.setattr(llm_module, "InferenceClient", FakeInferenceClient)
 
