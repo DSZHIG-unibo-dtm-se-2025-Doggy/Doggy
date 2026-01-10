@@ -1,48 +1,50 @@
 import importlib
 import os
+import sys
 
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
-import backend.Features.DogRecognition.dog_recognition as dr_module
-import backend.Features.LLM.llm_engine as llm_module
-
 
 def test_router_predict(monkeypatch):
-    # Avoid real HF token/model loading
+    # Avoid real model loading/token checks
     monkeypatch.setenv("HF_TOKEN", "dummy-token")
 
-    def fake_pipeline(*_, **__):
-        return lambda *_, **__: [{"label": "husky", "score": 0.9}]
+    class FakeDogModel:
+        def is_dog(self, *_):
+            return True
 
-    class FakeInferenceClient:
-        def __init__(self, token=None):
-            self.token = token
+        def predict(self, *_):
+            return [{"label": "husky", "score": 0.9}]
 
-        def chat_completion(self, *_, **__):
-            class Choice:
-                def __init__(self):
-                    self.message = {"content": "ok"}
+    class FakeLLM:
+        def generate_advice(self, breed: str):
+            return f"Advice for {breed}"
 
-            class Response:
-                def __init__(self):
-                    self.choices = [Choice()]
+    # Patch classes before importing router so its globals use stubs
+    monkeypatch.setattr(
+        "Features.DogRecognition.dog_recognition.DogRecognitionModel",
+        FakeDogModel,
+        raising=False,
+    )
+    monkeypatch.setattr(
+        "Features.LLM.llm_engine.DogLLMEngine",
+        FakeLLM,
+        raising=False,
+    )
 
-            return Response()
-
-    monkeypatch.setattr("transformers.pipeline", fake_pipeline)
-    monkeypatch.setattr(dr_module, "pipeline", fake_pipeline)
-    monkeypatch.setattr(llm_module, "InferenceClient", FakeInferenceClient)
+    # Drop cached modules to ensure patched imports are used
+    for mod in list(sys.modules):
+        if mod.startswith("Features.") or mod.startswith("backend.Features."):
+            sys.modules.pop(mod)
 
     import backend.Core.router as router
 
     importlib.reload(router)
 
-    class FakeModel:
-        def predict(self, path: str):
-            return [{"label": "husky", "score": 0.9}]
-
-    monkeypatch.setattr(router, "ml_model", FakeModel())
+    # Also replace instances on the router if already created
+    router.ml_model = FakeDogModel()
+    router.llm_engine = FakeLLM()
 
     app = FastAPI()
     app.include_router(router.router)
