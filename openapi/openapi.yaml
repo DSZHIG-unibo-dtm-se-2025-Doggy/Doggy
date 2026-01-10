@@ -1,0 +1,180 @@
+openapi: 3.0.3
+info:
+  title: Doggy API Contract
+  version: 0.1.0
+  description: Shared backend/web contract for the dog breed identification service.
+servers:
+  - url: http://localhost:8000
+paths:
+  /:
+    get:
+      summary: Health check
+      responses:
+        "200":
+          description: Backend is running
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+  /api/dog-advice:
+    get:
+      summary: Get breed-specific advice
+      parameters:
+        - name: breed
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Advice response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdviceResponse"
+        "500":
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "503":
+          description: Service unavailable
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "422":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+  /api/dog-from-photo:
+    post:
+      summary: Identify dog breed from photo and return advice
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/Body_dog_from_photo_api_dog_from_photo_post"
+      responses:
+        "200":
+          description: Prediction response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DogFromPhotoResponse"
+        "400":
+          description: Invalid image or not a dog
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "503":
+          description: Service unavailable
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "422":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+components:
+  schemas:
+    Body_dog_from_photo_api_dog_from_photo_post:
+      type: object
+      required:
+        - file
+      properties:
+        file:
+          type: string
+          format: binary
+    HealthStatus:
+      type: object
+      required:
+        - status
+        - message
+      properties:
+        status:
+          type: string
+          example: ok
+        message:
+          type: string
+          example: backend is running
+    AdviceResponse:
+      type: object
+      required:
+        - advice
+      properties:
+        advice:
+          type: string
+    DogFromPhotoResponse:
+      type: object
+      required:
+        - breed
+        - raw_predictions
+        - advice
+      properties:
+        breed:
+          type: string
+        raw_predictions:
+          type: array
+          items:
+            $ref: "#/components/schemas/Prediction"
+        advice:
+          type: string
+    Prediction:
+      type: object
+      required:
+        - label
+        - score
+      properties:
+        label:
+          type: string
+        score:
+          type: number
+          format: float
+    ErrorResponse:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
+    ValidationError:
+      type: object
+      required:
+        - loc
+        - msg
+        - type
+      properties:
+        loc:
+          type: array
+          items:
+            oneOf:
+              - type: string
+              - type: integer
+        msg:
+          type: string
+        type:
+          type: string
+    HTTPValidationError:
+      type: object
+      required:
+        - detail
+      properties:
+        detail:
+          type: array
+          items:
+            $ref: "#/components/schemas/ValidationError"
