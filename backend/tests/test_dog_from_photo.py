@@ -13,7 +13,7 @@ def test_non_dog_returns_error(monkeypatch):
     client = TestClient(main.app)
 
     monkeypatch.setattr(main, "dog_model", type("M", (), {"is_dog": lambda _, __=None: False}))
-    monkeypatch.setattr(main, "llm", object())  # just to avoid None check
+    monkeypatch.setattr(main, "llm", object())
 
     resp = client.post("/api/dog-from-photo", files={"file": dummy_file()})
     assert resp.status_code == 200
